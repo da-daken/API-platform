@@ -1,0 +1,33 @@
+server:
+  port: 8090
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+        exclude: env
+  endpoint:
+    health:
+      show-details: always
+#spring:
+#  cloud:
+#    gateway:
+#      default-filters:
+
+logging:
+  level:
+    org:
+      springframework:
+        cloud:
+          gateway: trace
+
+dubbo:
+  application:
+    name: dubbo-springboot-demo-provider
+  protocol:
+    name: dubbo
+    port: -1
+  registry:
+    address: nacos://localhost:8848
+
