@@ -10,10 +10,14 @@ import com.daken.project.common.ErrorCode;
 import com.daken.project.common.ResultUtils;
 import com.daken.project.exception.BusinessException;
 import com.daken.project.model.dto.user.*;
+import com.daken.project.model.vo.UserAkSkVo;
 import com.daken.project.model.vo.UserVO;
 import com.daken.project.service.UserService;
+import com.daken.project.utils.GenerateAkSkUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -32,6 +36,9 @@ public class UserController {
 
     @Resource
     private UserService userService;
+
+    @Autowired
+    private GenerateAkSkUtils generateAkSkUtils;
 
     // region 登录相关
 
@@ -233,6 +240,23 @@ public class UserController {
         }).collect(Collectors.toList());
         userVOPage.setRecords(userVOList);
         return ResultUtils.success(userVOPage);
+    }
+
+    /**
+     * 重新生成 ak/sk
+     * @param request
+     * @return
+     */
+    @GetMapping("/generateAkSk")
+    @Transactional
+    public BaseResponse<UserAkSkVo> generateAkSk(HttpServletRequest request){
+        User loginUser = userService.getLoginUser(request);
+        String accessKey = generateAkSkUtils.generateAk(loginUser.getUserAccount());
+        String secretKey = generateAkSkUtils.generateSk(loginUser.getUserAccount());
+        loginUser.setAccessKey(accessKey);
+        loginUser.setSecretKey(secretKey);
+        userService.updateById(loginUser);
+        return ResultUtils.success(new UserAkSkVo(loginUser.getId(), accessKey, secretKey));
     }
 
     // endregion

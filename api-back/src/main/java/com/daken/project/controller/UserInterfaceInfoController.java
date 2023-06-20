@@ -1,8 +1,10 @@
 package com.daken.project.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.daken.apiclientsdk.client.ApiClient;
+import com.daken.common.entity.InterfaceInfo;
 import com.daken.common.entity.User;
 import com.daken.common.entity.UserInterfaceInfo;
 import com.daken.project.annotation.AuthCheck;
@@ -12,18 +14,27 @@ import com.daken.project.constant.UserConstant;
 import com.daken.project.exception.BusinessException;
 
 import com.daken.project.model.dto.userInterfaceInfo.UserInterfaceInfoAddRequest;
+import com.daken.project.model.dto.userInterfaceInfo.UserInterfaceInfoBuyDto;
 import com.daken.project.model.dto.userInterfaceInfo.UserInterfaceInfoQueryRequest;
 import com.daken.project.model.dto.userInterfaceInfo.UserInterfaceInfoUpdateRequest;
+import com.daken.project.model.vo.SelfInterfaceDataVo;
+import com.daken.project.service.InterfaceInfoService;
 import com.daken.project.service.UserInterfaceInfoService;
 import com.daken.project.service.UserService;
+import com.daken.project.utils.BeanCopyUtils;
 import lombok.extern.slf4j.Slf4j;
+import net.bytebuddy.implementation.bytecode.Throw;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Objects;
+
+import static com.daken.project.constant.UserConstant.USER_LOGIN_STATE;
 
 /**
  * 总览接口
@@ -40,6 +51,9 @@ public class UserInterfaceInfoController {
 
     @Resource
     private UserService userService;
+
+    @Resource
+    private InterfaceInfoService interfaceInfoService;
 
 
     // region 增删改查
@@ -193,6 +207,64 @@ public class UserInterfaceInfoController {
                 sortOrder.equals(CommonConstant.SORT_ORDER_ASC), sortField);
         Page<UserInterfaceInfo> userInterfaceInfoPage = userInterfaceInfoService.page(new Page<>(current, size), queryWrapper);
         return ResultUtils.success(userInterfaceInfoPage);
+    }
+
+    /**
+     * 用户购买接口
+     * @param buyDto
+     * @return
+     */
+    @PostMapping("/buyInterface")
+    @Transactional
+    public BaseResponse<Boolean> buyInterface(UserInterfaceInfoBuyDto buyDto){
+        boolean res = false;
+        // 1. 判断用户是否存在
+        User user = userService.getById(buyDto.getUserId());
+        if(Objects.isNull(user)){
+            throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
+        }
+        // 2. 判断接口是否存在
+        InterfaceInfo interfaceInfo = interfaceInfoService.getById(buyDto.getInterfaceInfoId());
+        if(Objects.isNull(interfaceInfo)){
+            throw new BusinessException(ErrorCode.INTERFACE_NO_FOUND);
+        }
+        // 3. 查询用户与该接口的信息
+        LambdaQueryWrapper<UserInterfaceInfo> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(UserInterfaceInfo::getUserId, buyDto.getUserId());
+        queryWrapper.eq(UserInterfaceInfo::getInterfaceInfoId, buyDto.getInterfaceInfoId());
+        UserInterfaceInfo userInterfaceInfo = userInterfaceInfoService.getOne(queryWrapper);
+        if(Objects.isNull(userInterfaceInfo)){
+            userInterfaceInfo = UserInterfaceInfo.builder()
+                    .interfaceInfoId(buyDto.getInterfaceInfoId())
+                    .userId(buyDto.getUserId())
+                    .leftNum(buyDto.getLeftNum())
+                    .totalNum(buyDto.getLeftNum())
+                    .status(CommonConstant.ZERO).build();
+            res = userInterfaceInfoService.save(userInterfaceInfo);
+        } else {
+            userInterfaceInfo.setTotalNum(userInterfaceInfo.getTotalNum() + buyDto.getLeftNum());
+            userInterfaceInfo.setLeftNum(userInterfaceInfo.getLeftNum() + buyDto.getLeftNum());
+            res = userInterfaceInfoService.updateById(userInterfaceInfo);
+        }
+        return ResultUtils.success(res);
+    }
+
+    /**
+     * 查询个人接口拥有情况（全部）
+     * @param request
+     * @return
+     */
+    @GetMapping("/selfInterfaceData")
+    public BaseResponse<List<SelfInterfaceDataVo>> selfInterfaceData(HttpServletRequest request){
+        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
+        System.out.println(request.getSession().getId());
+        User currentUser = (User) userObj;
+        Long userId = currentUser.getId();
+        LambdaQueryWrapper<UserInterfaceInfo> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(UserInterfaceInfo::getUserId, userId);
+        List<UserInterfaceInfo> interfaceInfoList = userInterfaceInfoService.list(queryWrapper);
+        List<SelfInterfaceDataVo> selfInterfaceDataVos = BeanCopyUtils.copyBeanList(interfaceInfoList, SelfInterfaceDataVo.class);
+        return ResultUtils.success(selfInterfaceDataVos);
     }
 
 }

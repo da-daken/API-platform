@@ -9,10 +9,12 @@ import com.daken.project.common.ErrorCode;
 import com.daken.project.exception.BusinessException;
 import com.daken.project.mapper.UserMapper;
 import com.daken.project.service.UserService;
+import com.daken.project.utils.GenerateAkSkUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
@@ -34,6 +36,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Resource
     private UserMapper userMapper;
+
+    @Autowired
+    private GenerateAkSkUtils generateAkSkUtils;
 
     /**
      * 盐值，混淆密码
@@ -68,8 +73,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             // 2. 加密
             String encryptPassword = DigestUtils.md5DigestAsHex((SALT + userPassword).getBytes());
             // 3. 分配accessKey，secretKey
-            String accessKey = DigestUtil.md5Hex(SALT + userAccount + RandomUtil.randomNumbers(5));
-            String secretKey= DigestUtil.md5Hex(SALT + userAccount + RandomUtil.randomNumbers(8));
+            String accessKey = generateAkSkUtils.generateAk(userAccount);
+            String secretKey= generateAkSkUtils.generateSk(userAccount);
             // 4. 插入数据
             User user = new User();
             user.setUserAccount(userAccount);

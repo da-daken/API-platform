@@ -16,4 +16,14 @@ public interface CommonConstant {
      * 降序
      */
     String SORT_ORDER_DESC = " descend";
+
+    /**
+     * 0常量
+     */
+    Integer ZERO = 0;
+
+    /**
+     * 1常量
+     */
+    Integer ONE = 1;
 }
