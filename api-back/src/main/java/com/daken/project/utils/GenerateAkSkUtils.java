@@ -4,7 +4,7 @@ import cn.hutool.crypto.digest.HMac;
 import cn.hutool.crypto.digest.HmacAlgorithm;
 import org.springframework.stereotype.Component;
 
-\
+
 import java.util.Random;
 
 /**
