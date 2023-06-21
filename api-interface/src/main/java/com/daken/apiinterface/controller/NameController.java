@@ -14,10 +14,6 @@ public class NameController {
         return "GET 你的名字是" + name;
     }
 
-    @PostMapping("/post")
-    public String getNameByPost(@RequestParam String name) {
-        return "POST 你的名字是" + name;
-    }
 
     @PostMapping("/user")
     public String getUsernameByPost(@RequestBody User user, HttpServletRequest request) {

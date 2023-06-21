@@ -348,11 +348,11 @@ public class InterfaceInfoController {
         String accessKey = loginUser.getAccessKey();
         String secretKey = loginUser.getSecretKey();
         ApiClient tempClient = new ApiClient(accessKey, secretKey);
-        Gson gson = new Gson();
         Object result = null;
+        String paramsType = oldInterfaceInfo.getParamsType();
         // 将 json 字符串转为方法的参数对象
         if (oldInterfaceInfo.getMethod().equals("POST")) {
-            String paramsType = oldInterfaceInfo.getParamsType();
+
             if (paramsType == null) {
                 throw new BusinessException(ErrorCode.PARAMS_ERROR, "必须要传参数");
             }
@@ -361,28 +361,32 @@ public class InterfaceInfoController {
             result = method.invoke(tempClient, o);
         }
         else if (oldInterfaceInfo.getMethod().equals("GET")){
-            String[] paramsTypes = oldInterfaceInfo.getParamsType().split(";");
+//            String[] paramsTypes = oldInterfaceInfo.getParamsType().split(";");
             // 判断需要的参数是否需要参数
-            if (paramsTypes.length == 0){
+            if (paramsType == null){
                 Method method = tempClient.getClass().getMethod(oldInterfaceInfo.getName());
                 method.invoke(tempClient);
             } else {
-                // 获取参数类型
-                List<Class<?>> clazz = new ArrayList<>();
-                for (String paramType : paramsTypes){
-                    Class<?> aClass = Class.forName(paramType);
-                    clazz.add(aClass);
-                }
-                Class<?>[] classes = clazz.toArray(new Class[clazz.size()]);
-                // 获取传递的参数
-                Map paramsMap = (Map)JSON.parse(userRequestParams);
-                List<Object> params = new ArrayList<>();
-                for (Object map : paramsMap.entrySet()) {
-                    params.add(((Map.Entry) map).getValue());
-                }
-                Object[] paramsss = params.toArray();
-                Method method = tempClient.getClass().getMethod(oldInterfaceInfo.getName(), classes) ;
-                result = method.invoke(tempClient, paramsss);
+                /**
+                 * 优化逻辑，将所有的都封装为一个参数，由管理员进行更新发布
+                 */
+//                // 获取参数类型
+//                List<Class<?>> clazz = new ArrayList<>();
+//                for (String paramType : paramsTypes){
+//                    Class<?> aClass = Class.forName(paramType);
+//                    clazz.add(aClass);
+//                }
+//                Class<?>[] classes = clazz.toArray(new Class[clazz.size()]);
+//                // 获取传递的参数
+//                Map paramsMap = (Map)JSON.parse(userRequestParams);
+//                List<Object> params = new ArrayList<>();
+//                for (Object map : paramsMap.entrySet()) {
+//                    params.add(((Map.Entry) map).getValue());
+//                }
+//                Object[] paramsss = params.toArray();
+//                Method method = tempClient.getClass().getMethod(oldInterfaceInfo.getName(), classes) ;
+                Method method = tempClient.getClass().getMethod(oldInterfaceInfo.getName(), Class.forName(paramsType));
+                result = method.invoke(tempClient);
             }
         }
 //        com.daken.apiclientsdk.model.User user = gson.fromJson(userRequestParams, com.daken.apiclientsdk.model.User.class);
@@ -401,43 +405,5 @@ public class InterfaceInfoController {
     }
 
 
-    public static final String buySuccessMsg = "购买成功";
-    public static final String buyFailMsg = "购买失败，请重试";
-
-    /**
-     * 用户购买接口使用次数
-     * @param buyDto
-     * @return
-     */
-    @PostMapping("/buyInterface")
-    @Transactional
-    public BaseResponse<String> buyInterface(@RequestBody UserInterfaceInfoBuyDto buyDto){
-        // 1. 先用userId和interfaceInfoId查是否存在之前的记录
-        QueryWrapper<UserInterfaceInfo> queryWrapper=new QueryWrapper<>();
-        queryWrapper.eq("userId", buyDto.getUserId());
-        queryWrapper.eq("interfaceInfoId", buyDto.getInterfaceInfoId());
-        UserInterfaceInfo userInterfaceInfo = userInterfaceInfoService.getOne(queryWrapper);
-        if(!ObjectUtil.isEmpty(userInterfaceInfo)){
-            // 2. 还存在的话直接在基础上加上leftNum （update）
-            boolean update = userInterfaceInfoMapper.addLeftNum(buyDto.getLeftNum(), buyDto.getUserId(), buyDto.getInterfaceInfoId());
-            // 4. 返回购买成功
-            if(update){
-                return ResultUtils.success(buySuccessMsg);
-            } else {
-                return ResultUtils.error(ErrorCode.OPERATION_ERROR, buyFailMsg);
-            }
-        } else {
-            // 3. 不存在的话加上一条记录上去（insert）
-            UserInterfaceInfo userInterfaceInfo1 = BeanCopyUtils.copyBean(buyDto, UserInterfaceInfo.class);
-            boolean save = userInterfaceInfoService.save(userInterfaceInfo1);
-            // 4. 返回购买成功
-            if(save){
-                return ResultUtils.success(buySuccessMsg);
-            } else {
-                return ResultUtils.error(ErrorCode.OPERATION_ERROR, buyFailMsg);
-            }
-        }
-
-    }
 
 }
