@@ -18,17 +18,31 @@ import java.util.concurrent.TimeUnit;
 @DubboService
 public class InnerUserInterfaceInfoServiceImpl implements InnerUserInterfaceInfoService {
 
+    private static final String LOCK_NAME = ":lock:";
+
     @Resource
     private UserInterfaceInfoService userInterfaceInfoService;
 
     @Resource
     private RedissonClient redissonClient;
 
+    /**
+     * 调用次数 + 1
+     * @param interfaceInfoId
+     * @param userId
+     * @return
+     */
     @Override
     public boolean invokeCount(long interfaceInfoId, long userId) {
         return userInterfaceInfoService.invokeCount(interfaceInfoId,userId);
     }
 
+    /**
+     * 查询是否还有次数
+     * @param interfaceInfoId
+     * @param userId
+     * @return
+     */
     @Override
     public boolean isLeftnum(long interfaceInfoId, long userId) {
         UserInterfaceInfo userInterfaceInfo = null;
@@ -44,7 +58,7 @@ public class InnerUserInterfaceInfoServiceImpl implements InnerUserInterfaceInfo
 //            userInterfaceInfo = userInterfaceInfoService.getOne(queryWrapper);
 //        }
         // 2. 分布式锁(单个节点)
-        RLock rLock = redissonClient.getLock("daken:lock:");
+        RLock rLock = redissonClient.getLock(String.valueOf(userId) + LOCK_NAME);
         try {
             if (rLock.tryLock(80, -1, TimeUnit.MILLISECONDS)) {
                 // 用户interfaceId，和userId查出 leftNum的值
@@ -60,7 +74,7 @@ public class InnerUserInterfaceInfoServiceImpl implements InnerUserInterfaceInfo
                 rLock.unlock();
             }
         }
-        // 3. 分布式锁(redis集群)
+        // 3. redLock(redis集群)
         
 
         if(ObjectUtil.isEmpty(userInterfaceInfo)){
