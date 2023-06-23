@@ -11,7 +11,7 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * 敏感词过滤
+ * 敏感词过滤, 基于DFA算法
  *
  * @author daken
  */
