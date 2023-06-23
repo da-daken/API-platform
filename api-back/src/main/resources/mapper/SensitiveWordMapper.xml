@@ -2,9 +2,9 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="generator.mapper.SensitiveWordMapper">
+<mapper namespace="com.daken.project.mapper.SensitiveWordMapper">
 
-    <resultMap id="BaseResultMap" type="generator.domain.SensitiveWord">
+    <resultMap id="BaseResultMap" type="com.daken.common.entity.SensitiveWord">
             <id property="id" column="id" jdbcType="INTEGER"/>
             <result property="word" column="word" jdbcType="VARCHAR"/>
     </resultMap>

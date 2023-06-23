@@ -12,6 +12,7 @@ import com.daken.project.exception.BusinessException;
 import com.daken.project.model.dto.user.*;
 import com.daken.project.model.vo.UserAkSkVo;
 import com.daken.project.model.vo.UserVO;
+import com.daken.project.sensitive.SensitiveWordUtils;
 import com.daken.project.service.UserService;
 import com.daken.project.utils.GenerateAkSkUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -40,6 +41,9 @@ public class UserController {
     @Autowired
     private GenerateAkSkUtils generateAkSkUtils;
 
+    @Autowired
+    private SensitiveWordUtils sensitiveWordUtils;
+
     // region 登录相关
 
     /**
@@ -58,6 +62,9 @@ public class UserController {
         String checkPassword = userRegisterRequest.getCheckPassword();
         if (StringUtils.isAnyBlank(userAccount, userPassword, checkPassword)) {
             return null;
+        }
+        if (sensitiveWordUtils.hasSensitiveWord(userAccount)){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "请文明用语呢傻逼");
         }
         long result = userService.userRegister(userAccount, userPassword, checkPassword);
         return ResultUtils.success(result);
