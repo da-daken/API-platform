@@ -40,10 +40,7 @@ import javax.xml.soap.Text;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 接口具体信息
@@ -405,5 +402,14 @@ public class InterfaceInfoController {
     }
 
 
-
+    @GetMapping("/interfaceNameList")
+    public BaseResponse<Map> interfaceNameList(){
+        List<InterfaceInfo> list = interfaceInfoService.list();
+        Map interfaceNameMap=new HashMap();
+        for (InterfaceInfo interfaceInfo : list) {
+            String name = interfaceInfo.getName();
+            interfaceNameMap.put(interfaceInfo.getName(),interfaceInfo.getName());
+        }
+        return ResultUtils.success(interfaceNameMap);
+    }
 }

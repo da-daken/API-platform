@@ -219,31 +219,35 @@ public class UserInterfaceInfoController {
     public BaseResponse<Boolean> buyInterface(UserInterfaceInfoBuyDto buyDto){
         boolean res = false;
         // 1. 判断用户是否存在
-        User user = userService.getById(buyDto.getUserId());
+        LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(User::getUserAccount, buyDto.getPayAccount());
+        User user = userService.getOne(wrapper);
         if(Objects.isNull(user)){
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
         }
         // 2. 判断接口是否存在
-        InterfaceInfo interfaceInfo = interfaceInfoService.getById(buyDto.getInterfaceInfoId());
+        LambdaQueryWrapper<InterfaceInfo> wrapper1 = new LambdaQueryWrapper<>();
+        wrapper1.eq(InterfaceInfo::getName, buyDto.getInterfaceName());
+        InterfaceInfo interfaceInfo = interfaceInfoService.getOne(wrapper1);
         if(Objects.isNull(interfaceInfo)){
             throw new BusinessException(ErrorCode.INTERFACE_NO_FOUND);
         }
         // 3. 查询用户与该接口的信息
         LambdaQueryWrapper<UserInterfaceInfo> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(UserInterfaceInfo::getUserId, buyDto.getUserId());
-        queryWrapper.eq(UserInterfaceInfo::getInterfaceInfoId, buyDto.getInterfaceInfoId());
+        queryWrapper.eq(UserInterfaceInfo::getUserId, user.getId());
+        queryWrapper.eq(UserInterfaceInfo::getInterfaceInfoId, interfaceInfo.getId());
         UserInterfaceInfo userInterfaceInfo = userInterfaceInfoService.getOne(queryWrapper);
         if(Objects.isNull(userInterfaceInfo)){
             userInterfaceInfo = UserInterfaceInfo.builder()
-                    .interfaceInfoId(buyDto.getInterfaceInfoId())
-                    .userId(buyDto.getUserId())
-                    .leftNum(buyDto.getLeftNum())
-                    .totalNum(buyDto.getLeftNum())
+                    .interfaceInfoId(interfaceInfo.getId())
+                    .userId(user.getId())
+                    .leftNum(buyDto.getNum())
+                    .totalNum(buyDto.getNum())
                     .status(CommonConstant.ZERO).build();
             res = userInterfaceInfoService.save(userInterfaceInfo);
         } else {
-            userInterfaceInfo.setTotalNum(userInterfaceInfo.getTotalNum() + buyDto.getLeftNum());
-            userInterfaceInfo.setLeftNum(userInterfaceInfo.getLeftNum() + buyDto.getLeftNum());
+            userInterfaceInfo.setTotalNum(userInterfaceInfo.getTotalNum() + buyDto.getNum());
+            userInterfaceInfo.setLeftNum(userInterfaceInfo.getLeftNum() + buyDto.getNum());
             res = userInterfaceInfoService.updateById(userInterfaceInfo);
         }
         return ResultUtils.success(res);

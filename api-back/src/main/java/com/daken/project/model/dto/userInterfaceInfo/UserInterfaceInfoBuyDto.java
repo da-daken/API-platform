@@ -16,16 +16,16 @@ public class UserInterfaceInfoBuyDto implements Serializable {
     /**
      * 用户id，用于标识
      */
-    private Long userId;
+    private String interfaceName;
 
     /**
      * 接口id，用于标识
      */
-    private Long interfaceInfoId;
+    private String payAccount;
 
     /**
      * 需要购买（增加）的接口数量
      */
-    private Integer leftNum;
+    private Integer num;
 
 }
