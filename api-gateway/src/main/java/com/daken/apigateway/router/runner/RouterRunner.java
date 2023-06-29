@@ -51,7 +51,8 @@ public class RouterRunner implements CommandLineRunner {
             if(myPredicateDefinitions != null) {
                 myRouteDefinition.setPredicates(myPredicateDefinitions);
             }
-            // 5. 把路由加进来
+            // 5. 把路由加进来(先删在加)
+
             routeService.add(myRouteDefinition);
         }
     }

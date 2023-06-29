@@ -24,7 +24,7 @@ public class BaiduController {
      * @return
      */
     @PostMapping("/baiduHotInfo")
-    public BaseResponse<String> getBaiduHotInfo(@RequestBody(required = false) BaiduHotParams baiduParams, HttpServletRequest request){
+    public String getBaiduHotInfo(@RequestBody(required = false) BaiduHotParams baiduParams, HttpServletRequest request){
         //https://restapi.amap.com/v3/weather/weatherInfo?
         String baiduUrl = "https://www.coderutil.com/api/resou/v1/baidu";
         HashMap<String, Object> paramMap = new HashMap<>();
@@ -36,7 +36,7 @@ public class BaiduController {
             paramMap.put("size", baiduParams.getSize());
         }
         String result = HttpUtil.get(baiduUrl, paramMap);
-        return ResultUtils.success(result);
+        return result;
     }
 
 }

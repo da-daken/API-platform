@@ -70,21 +70,16 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
         log.info("请求来源地址"+sourceAddress);
         ServerHttpResponse response = exchange.getResponse();
         // 3. 黑白名单
-        if(!IP_WHITE_LIST.contains(sourceAddress)){
-            return handleNoAuth(response);
-        }
+//        if(!IP_WHITE_LIST.contains(sourceAddress)){
+//            return handleNoAuth(response);
+//        }
         // 4. 用户鉴权（判断ak，sk是否合法）
         HttpHeaders headers = request.getHeaders();
         String accessKey = headers.getFirst("accessKey");
         String nonce = headers.getFirst("nonce");
         String timestamp = headers.getFirst("timestamp");
         String sign = headers.getFirst("sign");
-        String body = null;
-        try {
-            body = URLDecoder.decode(headers.getFirst("body"), "utf-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
+        String body = headers.getFirst("body");
         // 去数据库中查是否已分配给用户
 //        if (!"api".equals(accessKey)) {
 //            return handleNoAuth(response);

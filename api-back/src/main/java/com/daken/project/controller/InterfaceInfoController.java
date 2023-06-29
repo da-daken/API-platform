@@ -344,25 +344,19 @@ public class InterfaceInfoController {
         User loginUser = userService.getLoginUser(request);
         String accessKey = loginUser.getAccessKey();
         String secretKey = loginUser.getSecretKey();
-        ApiClient tempClient = new ApiClient(accessKey, secretKey);
+        ApiClient apiClient = new ApiClient(accessKey, secretKey);
         Object result = null;
         String paramsType = oldInterfaceInfo.getParamsType();
         // 将 json 字符串转为方法的参数对象
         if (oldInterfaceInfo.getMethod().equals("POST")) {
-
-            if (paramsType == null) {
-                throw new BusinessException(ErrorCode.PARAMS_ERROR, "必须要传参数");
-            }
-            Object o = JsonUtils.getJsonToBean(userRequestParams, Class.forName(paramsType));
-            Method method = tempClient.getClass().getMethod(oldInterfaceInfo.getName(), Class.forName(paramsType));
-            result = method.invoke(tempClient, o);
+            result = apiClient.onlineInvoke(userRequestParams, oldInterfaceInfo.getUrl());
         }
         else if (oldInterfaceInfo.getMethod().equals("GET")){
 //            String[] paramsTypes = oldInterfaceInfo.getParamsType().split(";");
             // 判断需要的参数是否需要参数
             if (paramsType == null){
-                Method method = tempClient.getClass().getMethod(oldInterfaceInfo.getName());
-                method.invoke(tempClient);
+                Method method = apiClient.getClass().getMethod(oldInterfaceInfo.getName());
+                method.invoke(apiClient);
             } else {
                 /**
                  * 优化逻辑，将所有的都封装为一个参数，由管理员进行更新发布
@@ -381,13 +375,14 @@ public class InterfaceInfoController {
 //                    params.add(((Map.Entry) map).getValue());
 //                }
 //                Object[] paramsss = params.toArray();
-//                Method method = tempClient.getClass().getMethod(oldInterfaceInfo.getName(), classes) ;
-                Method method = tempClient.getClass().getMethod(oldInterfaceInfo.getName(), Class.forName(paramsType));
-                result = method.invoke(tempClient);
+//                Method method = apiClient.getClass().getMethod(oldInterfaceInfo.getName(), classes) ;
+//                Method method = apiClient.getClass().getMethod(oldInterfaceInfo.getName(), Class.forName(paramsType));
+//                result = method.invoke(apiClient);
+
             }
         }
 //        com.daken.apiclientsdk.model.User user = gson.fromJson(userRequestParams, com.daken.apiclientsdk.model.User.class);
-//        String result = tempClient.getUsernameByPost(user);
+//        String result = apiClient.getUsernameByPost(user);
         return ResultUtils.success(result);
     }
 

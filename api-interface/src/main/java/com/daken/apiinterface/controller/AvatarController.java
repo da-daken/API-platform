@@ -22,16 +22,11 @@ public class AvatarController {
      * @return
      */
     @PostMapping("/avatarUrl")
-    public BaseResponse<String> getAvatarUrl(@RequestBody(required = false) AvatarParams avatarParams, HttpServletRequest request){
+    public String  getAvatarUrl(@RequestBody(required = false) AvatarParams avatarParams, HttpServletRequest request) throws Exception{
         //https://restapi.amap.com/v3/weather/weatherInfo?
         String avatarUrl = "https://www.loliapi.com/acg/pp/";
-        String redirectUrl ;
-        try {
-            redirectUrl = getRedirectUrl(avatarUrl);
-        } catch (Exception e){
-            return ResultUtils.error(ErrorCode.SYSTEM_ERROR, "请求接口异常，请联系管理员");
-        }
-        return ResultUtils.success(redirectUrl);
+        String redirectUrl = getRedirectUrl(avatarUrl);
+        return redirectUrl;
     }
 
     /**

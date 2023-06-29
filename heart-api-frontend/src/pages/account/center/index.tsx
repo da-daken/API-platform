@@ -198,7 +198,7 @@ const Center: React.FC<RouteChildrenProps> = () => {
                 <TagList tags={tag || []} />
                 <Divider style={{ marginTop: 16 }} dashed />
                 <div className={styles.team}>
-                  <div className={styles.teamTitle}>团队</div>
+                  <div className={styles.teamTitle}>更换</div>
                   <Row gutter={36}>
                     {notice &&
                       notice.map((item) => (
@@ -213,13 +213,13 @@ const Center: React.FC<RouteChildrenProps> = () => {
                 </div>
               </div>
             )}
+            <div>
+              <button onClick={() => {
+                generateAkSk().then()
+              }}>更换ak/sk</button>
+            </div>
           </Card>
         </Col>
-        <p>
-          <button onClick={() => {
-            generateAkSk().then()
-          }}>更换ak/sk</button>
-        </p>
         <Col lg={17} md={24}>
           <Card
             className={styles.tabsCard}

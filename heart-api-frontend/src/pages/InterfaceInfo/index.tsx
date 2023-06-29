@@ -44,6 +44,7 @@ const Index: React.FC = () => {
       const res = await getInterfaceInfoByIdUsingGET({
         id: Number(params.id)
       });
+      console.log(res);
       setData(res.data);
     } catch (error: any) {
       message.error('请求失败，' + error.message);

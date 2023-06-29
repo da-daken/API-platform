@@ -16,7 +16,7 @@ public class SelfInterfaceDataVo {
     /**
      * 接口名称
      */
-    private String name;
+    private String interfaceName;
     /**
      * 总调用次数
      */

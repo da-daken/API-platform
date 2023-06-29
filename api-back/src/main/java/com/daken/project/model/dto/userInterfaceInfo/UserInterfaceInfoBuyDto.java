@@ -14,12 +14,12 @@ import java.io.Serializable;
 public class UserInterfaceInfoBuyDto implements Serializable {
 
     /**
-     * 用户id，用于标识
+     * 接口名称，用于标识
      */
     private String interfaceName;
 
     /**
-     * 接口id，用于标识
+     * 用户名称，用于标识
      */
     private String payAccount;
 

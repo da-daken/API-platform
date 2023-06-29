@@ -52,7 +52,7 @@ public class ApiClient {
      */
     public String getAvatarUrl(AvatarParams avatarParams){
         String params = JSON.toJSONString(avatarParams);
-        String avatarUrl = postRequest(params, "/api/avatar/avatarUrl");
+        String avatarUrl = onlineInvoke(params, "/api/avatar/avatarUrl");
         return avatarUrl;
     }
 
@@ -63,7 +63,7 @@ public class ApiClient {
      */
     public String getBaiduHotInfo(BaiduHotParams baiduHotParams){
         String params = JSON.toJSONString(baiduHotParams);
-        String baiduHotInfo = postRequest(params, "/api/baidu/baiduHotInfo");
+        String baiduHotInfo = onlineInvoke(params, "/api/baidu/baiduHotInfo");
         return baiduHotInfo;
     }
 
@@ -77,17 +77,17 @@ public class ApiClient {
      */
     public String getUsernameByPost(User user) throws UnsupportedEncodingException {
         String json = JSONUtil.toJsonStr(user);
-        String result = postRequest(json, "/api/name/user");
+        String result = onlineInvoke(json, "/api/name/user");
         return result;
     }
 
     /**
-     * 封装post请求
+     * 在线调用
      * @param parameters
      * @param url
      * @return
      */
-    private String postRequest(String parameters,String url){
+    public String onlineInvoke(String parameters,String url){
         HttpResponse httpResponse = HttpRequest.post(GATEWAY_HOST + url)
                 .addHeaders(getHeaderMap(parameters))
                 .body(parameters)

@@ -41,6 +41,14 @@ public class UserVO implements Serializable {
      * 用户角色: user, admin
      */
     private String userRole;
+    /**
+     * accessKey
+     */
+    private String accessKey;
+    /**
+     * secretKey
+     */
+    private String secretKey;
 
     /**
      * 创建时间

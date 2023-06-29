@@ -17,7 +17,7 @@ const Settings: LayoutSettings & {
   colorWeak: false,
   splitMenus: false,
   pwa: false,
-  title: 'HeartApi开放平台',
+  title: 'DakenApi开放平台',
   logo: 'https://gw.alipayobjects.com/zos/rmsportal/KDpgvguMpGfqaHPjicRK.svg',
   iconfontUrl: '',
 };

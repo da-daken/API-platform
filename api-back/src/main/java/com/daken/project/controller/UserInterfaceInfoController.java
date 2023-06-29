@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -42,7 +43,7 @@ import static com.daken.project.constant.UserConstant.USER_LOGIN_STATE;
  * @author daken
  */
 @RestController
-@RequestMapping("/userInterfaceInfo")
+@RequestMapping("/userInterfaceInfoInfo")
 @Slf4j
 public class UserInterfaceInfoController {
 
@@ -216,7 +217,7 @@ public class UserInterfaceInfoController {
      */
     @PostMapping("/buyInterface")
     @Transactional
-    public BaseResponse<Boolean> buyInterface(UserInterfaceInfoBuyDto buyDto){
+    public BaseResponse<Boolean> buyInterface(@RequestBody UserInterfaceInfoBuyDto buyDto){
         boolean res = false;
         // 1. 判断用户是否存在
         LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
@@ -267,7 +268,16 @@ public class UserInterfaceInfoController {
         LambdaQueryWrapper<UserInterfaceInfo> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(UserInterfaceInfo::getUserId, userId);
         List<UserInterfaceInfo> interfaceInfoList = userInterfaceInfoService.list(queryWrapper);
-        List<SelfInterfaceDataVo> selfInterfaceDataVos = BeanCopyUtils.copyBeanList(interfaceInfoList, SelfInterfaceDataVo.class);
+        List<SelfInterfaceDataVo> selfInterfaceDataVos = new ArrayList<>();
+        for (UserInterfaceInfo info : interfaceInfoList){
+            SelfInterfaceDataVo selfInterfaceDateVo;
+            selfInterfaceDateVo = BeanCopyUtils.copyBean(info, SelfInterfaceDataVo.class);
+            LambdaQueryWrapper<InterfaceInfo> lqw1 = new LambdaQueryWrapper<>();
+            lqw1.eq(InterfaceInfo::getId, info.getInterfaceInfoId());
+            InterfaceInfo one = interfaceInfoService.getOne(lqw1);
+            selfInterfaceDateVo.setInterfaceName(one.getName());
+            selfInterfaceDataVos.add(selfInterfaceDateVo);
+        }
         return ResultUtils.success(selfInterfaceDataVos);
     }
 
