@@ -141,6 +141,7 @@ declare namespace API {
     url?: string;
     userId?: number;
     paramsType?: string;
+    host?: string;
   };
 
   type InterfaceInfoAddRequest = {

@@ -4,11 +4,13 @@ package com.daken.apiclientsdk.client;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
-import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.TypeReference;
+import com.daken.apiclientsdk.common.HttpMethod;
 import com.daken.apiclientsdk.model.AvatarParams;
 import com.daken.apiclientsdk.model.BaiduHotParams;
+import com.daken.apiclientsdk.model.DouYinParseParams;
 import com.daken.apiclientsdk.model.User;
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,7 +30,16 @@ public class ApiClient {
 
     private String secretKey;
 
+    /**
+     * 网关地址
+     */
     private static final String GATEWAY_HOST = "http://localhost:8090";
+
+    /**
+     * get请求的参数map
+     */
+    private static Map<String, Object> GET_PARAMS;
+
 
     public ApiClient(String accessKey, String secretKey) {
         this.accessKey = accessKey;
@@ -52,7 +63,7 @@ public class ApiClient {
      */
     public String getAvatarUrl(AvatarParams avatarParams){
         String params = JSON.toJSONString(avatarParams);
-        String avatarUrl = onlineInvoke(params, "/api/avatar/avatarUrl");
+        String avatarUrl = onlineInvoke(params, "/api/avatar/avatarUrl", HttpMethod.POST_METHOD);
         return avatarUrl;
     }
 
@@ -63,8 +74,14 @@ public class ApiClient {
      */
     public String getBaiduHotInfo(BaiduHotParams baiduHotParams){
         String params = JSON.toJSONString(baiduHotParams);
-        String baiduHotInfo = onlineInvoke(params, "/api/baidu/baiduHotInfo");
+        String baiduHotInfo = onlineInvoke(params, "/api/baidu/baiduHotInfo", HttpMethod.POST_METHOD);
         return baiduHotInfo;
+    }
+
+    public String getDouYinUrlParse(DouYinParseParams douYinParseParams){
+        String params = JSON.toJSONString(douYinParseParams);
+        String urlParse = onlineInvoke(params, "/api/douyin/parse", HttpMethod.GET_METHOD);
+        return urlParse;
     }
 
 
@@ -77,7 +94,7 @@ public class ApiClient {
      */
     public String getUsernameByPost(User user) throws UnsupportedEncodingException {
         String json = JSONUtil.toJsonStr(user);
-        String result = onlineInvoke(json, "/api/name/user");
+        String result = onlineInvoke(json, "/api/name/user", HttpMethod.POST_METHOD);
         return result;
     }
 
@@ -87,13 +104,25 @@ public class ApiClient {
      * @param url
      * @return
      */
-    public String onlineInvoke(String parameters,String url){
-        HttpResponse httpResponse = HttpRequest.post(GATEWAY_HOST + url)
-                .addHeaders(getHeaderMap(parameters))
-                .body(parameters)
-                .execute();
-        log.info("返回状态：{}  返回结果 : {}", httpResponse.getStatus(), httpResponse.body());
-        String result = httpResponse.body();
+    public String onlineInvoke(String parameters,String url, String method){
+        String result = null;
+        if (HttpMethod.POST_METHOD.equals(method)){
+            HttpResponse httpResponse = HttpRequest.post(GATEWAY_HOST + url)
+                    .addHeaders(getHeaderMap(parameters))
+                    .body(parameters)
+                    .execute();
+            log.info("返回状态：{}  返回结果 : {}", httpResponse.getStatus(), httpResponse.body());
+            result = httpResponse.body();
+        }
+        else if (HttpMethod.GET_METHOD.equals(method)){
+            GET_PARAMS = JSON.parseObject(parameters, new TypeReference<Map<String, Object>>(){});
+            HttpResponse httpResponse = HttpRequest.get(GATEWAY_HOST + url)
+                    .addHeaders(getHeaderMap(parameters))
+                    .form(GET_PARAMS)
+                    .execute();
+            log.info("返回状态：{}  返回结果 : {}", httpResponse.getStatus(), httpResponse.body());
+            result = httpResponse.body();
+        }
         return result;
     }
 

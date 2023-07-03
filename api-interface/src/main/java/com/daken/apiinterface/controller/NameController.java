@@ -1,6 +1,8 @@
 package com.daken.apiinterface.controller;
 
 import com.daken.apiclientsdk.model.User;
+import com.daken.apiinterface.common.BaseResponse;
+import com.daken.apiinterface.common.ResultUtils;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 
@@ -10,8 +12,9 @@ public class NameController {
 
 
     @GetMapping("/get")
-    public String getNameByGet(String name) {
-        return "GET 你的名字是" + name;
+    public BaseResponse<String> getNameByGet(String name) {
+        String res = "GET你的名字是：" + name;
+        return ResultUtils.success(res);
     }
 
 

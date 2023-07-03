@@ -28,7 +28,7 @@
     </update>
 
     <select id="listTopInvokeInterfaceInfo" resultType="com.daken.common.entity.UserInterfaceInfo">
-        select interfaceInfoId, sum(totalNum) as totalNum
+        select interfaceInfoId, sum(totalNum) as totalNum, sum(leftNum) as leftNum
         from user_interface_info
         group by interfaceInfoId
         order by totalNum desc

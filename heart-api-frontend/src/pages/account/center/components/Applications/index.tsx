@@ -53,7 +53,7 @@ const Applications: React.FC = () => {
   }> = ({ activeUser, newUser }) => (
     <div className={stylesApplications.cardInfo}>
       <div>
-        <p>已调用次数</p>
+        <p>总调用次数</p>
         <p>{activeUser}</p>
       </div>
       <div>

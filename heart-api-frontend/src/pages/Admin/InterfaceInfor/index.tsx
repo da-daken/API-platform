@@ -212,6 +212,12 @@ const TableList: React.FC = () => {
       width: 400,
     },
     {
+      title: '主机地址',
+      dataIndex: 'host',
+      valueType: 'text',
+      width: 400,
+    },
+    {
       title: '请求方法',
       dataIndex: 'method',
       valueType: 'text',
@@ -316,7 +322,6 @@ const TableList: React.FC = () => {
         }}
         scroll={{ x: 1900 }}
         toolBarRender={() => [
-          // todo mark
           <Button
             type="primary"
             key="primary"

@@ -30,14 +30,17 @@ const Index: React.FC = () => {
       message.error('参数不存在');
       return;
     }
-    //天气接口
+    //测试get接口
     if(Number(params.id)===2){
-      param.city="南昌市";
-      param.extensions="all";
+      param.name="test";
     }
     //百度接口
     if(Number(params.id)===3){
       param.size="10";
+    }
+    //抖音接口
+    if(Number(params.id)===4){
+      param.url = "https://v.douyin.com/i2MDg5H/"
     }
     setLoading(true);
     try {

@@ -99,6 +99,20 @@ export async function listInterfaceInfoByPageUsingGET(
     ...(options || {}),
   });
 }
+/** userListInterfaceInfoByPage GET /api/interfaceInfo/list/userPage */
+export async function userListInterfaceInfoByPageUsingGET(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: API.listInterfaceInfoByPageUsingGETParams,
+  options?: { [key: string]: any },
+) {
+  return request<API.BaseResponsePageInterfaceInfo>('/api/interfaceInfo/list/userPage', {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
+  });
+}
 
 /** offlineInterfaceInfo POST /api/interfaceInfo/offline */
 export async function offlineInterfaceInfoUsingPOST(

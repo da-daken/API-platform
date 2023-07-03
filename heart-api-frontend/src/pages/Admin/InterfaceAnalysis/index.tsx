@@ -40,7 +40,7 @@ const InterfaceAnalysis: React.FC = () => {
 
   const options = {
     title: {
-      text: '热点接口调用数据TOP3',
+      text: '热点接口调用数据TOP5',
       subtext: '分析饼图',
       left: 'center'
     },

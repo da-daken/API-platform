@@ -1,6 +1,8 @@
+com\daken\common\entity\UserInterfaceInfo$UserInterfaceInfoBuilder.class
 com\daken\common\service\InnerInterfaceInfoService.class
 com\daken\common\entity\InterfaceInfo.class
 com\daken\common\service\InnerUserService.class
+com\daken\common\entity\SensitiveWord.class
 com\daken\common\entity\UserInterfaceInfo.class
 com\daken\common\service\InnerUserInterfaceInfoService.class
 com\daken\common\entity\Router.class

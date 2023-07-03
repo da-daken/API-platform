@@ -188,12 +188,13 @@ public class InterfaceInfoController {
     }
 
     /**
-     * 分页获取列表(前台用户观察的)
+     * 分页获取列表(后台用户管理)
      *
      * @param interfaceInfoQueryRequest
      * @param request
      * @return
      */
+    @AuthCheck(mustRole = "admin")
     @GetMapping("/list/page")
     public BaseResponse<Page<InterfaceInfo>> listInterfaceInfoByPage(InterfaceInfoQueryRequest interfaceInfoQueryRequest, HttpServletRequest request) {
         if (interfaceInfoQueryRequest == null) {
@@ -220,41 +221,39 @@ public class InterfaceInfoController {
         return ResultUtils.success(interfaceInfoPage);
     }
 
-//    /**
-//     * 分页获取列表(后台管理页面的)
-//     *
-//     * @param interfaceInfoQueryRequest
-//     * @param request
-//     * @return
-//     */
-//    @GetMapping("/list/adminPage")
-//    public BaseResponse<Page<InterfaceInfo>> AdminlistInterfaceInfoByPage(InterfaceInfoQueryRequest interfaceInfoQueryRequest, HttpServletRequest request) {
-//        if (interfaceInfoQueryRequest == null) {
-//            throw new BusinessException(ErrorCode.PARAMS_ERROR);
-//        }
-//        InterfaceInfo interfaceInfoQuery = new InterfaceInfo();
-//        BeanUtils.copyProperties(interfaceInfoQueryRequest, interfaceInfoQuery);
-//        long current = interfaceInfoQueryRequest.getCurrent();
-//        long size = interfaceInfoQueryRequest.getPageSize();
-//        String sortField = interfaceInfoQueryRequest.getSortField();
-//        String sortOrder = interfaceInfoQueryRequest.getSortOrder();
-//        String description = interfaceInfoQuery.getDescription();
-//        // description 需支持模糊搜索
-//        interfaceInfoQuery.setDescription(null);
-//        // 限制爬虫
-//        if (size > 50) {
-//            throw new BusinessException(ErrorCode.PARAMS_ERROR);
-//        }
-//        QueryWrapper<InterfaceInfo> queryWrapper = new QueryWrapper<>(interfaceInfoQuery);
-//        queryWrapper.like(StringUtils.isNotBlank(description), "content", description);
-//        queryWrapper.eq("status","1");
-//        queryWrapper.orderBy(StringUtils.isNotBlank(sortField),
-//                sortOrder.equals(CommonConstant.SORT_ORDER_ASC), sortField);
-//        Page<InterfaceInfo> interfaceInfoPage = interfaceInfoService.page(new Page<>(current, size), queryWrapper);
-//        return ResultUtils.success(interfaceInfoPage);
-//    }
-
-    // endregion
+    /**
+     * 分页获取列表(前台用户页面)
+     *
+     * @param interfaceInfoQueryRequest
+     * @param request
+     * @return
+     */
+    @GetMapping("/list/userPage")
+    public BaseResponse<Page<InterfaceInfo>> userListInterfaceInfoByPage(InterfaceInfoQueryRequest interfaceInfoQueryRequest, HttpServletRequest request) {
+        if (interfaceInfoQueryRequest == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        InterfaceInfo interfaceInfoQuery = new InterfaceInfo();
+        BeanUtils.copyProperties(interfaceInfoQueryRequest, interfaceInfoQuery);
+        long current = interfaceInfoQueryRequest.getCurrent();
+        long size = interfaceInfoQueryRequest.getPageSize();
+        String sortField = interfaceInfoQueryRequest.getSortField();
+        String sortOrder = interfaceInfoQueryRequest.getSortOrder();
+        String description = interfaceInfoQuery.getDescription();
+        // description 需支持模糊搜索
+        interfaceInfoQuery.setDescription(null);
+        // 限制爬虫
+        if (size > 50) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        QueryWrapper<InterfaceInfo> queryWrapper = new QueryWrapper<>(interfaceInfoQuery);
+        queryWrapper.like(StringUtils.isNotBlank(description), "content", description);
+        queryWrapper.eq("status","1");
+        queryWrapper.orderBy(StringUtils.isNotBlank(sortField),
+                sortOrder.equals(CommonConstant.SORT_ORDER_ASC), sortField);
+        Page<InterfaceInfo> interfaceInfoPage = interfaceInfoService.page(new Page<>(current, size), queryWrapper);
+        return ResultUtils.success(interfaceInfoPage);
+    }
 
     /**
      * 发布
@@ -347,17 +346,18 @@ public class InterfaceInfoController {
         ApiClient apiClient = new ApiClient(accessKey, secretKey);
         Object result = null;
         String paramsType = oldInterfaceInfo.getParamsType();
+        result = apiClient.onlineInvoke(userRequestParams, oldInterfaceInfo.getUrl(), oldInterfaceInfo.getMethod().toUpperCase());
         // 将 json 字符串转为方法的参数对象
-        if (oldInterfaceInfo.getMethod().equals("POST")) {
-            result = apiClient.onlineInvoke(userRequestParams, oldInterfaceInfo.getUrl());
-        }
-        else if (oldInterfaceInfo.getMethod().equals("GET")){
-//            String[] paramsTypes = oldInterfaceInfo.getParamsType().split(";");
-            // 判断需要的参数是否需要参数
-            if (paramsType == null){
-                Method method = apiClient.getClass().getMethod(oldInterfaceInfo.getName());
-                method.invoke(apiClient);
-            } else {
+//        if (oldInterfaceInfo.getMethod().equals("POST")) {
+//            result = apiClient.onlineInvoke(userRequestParams, oldInterfaceInfo.getUrl());
+//        }
+//        else if (oldInterfaceInfo.getMethod().equals("GET")){
+////            String[] paramsTypes = oldInterfaceInfo.getParamsType().split(";");
+//            // 判断需要的参数是否需要参数
+//            if (paramsType == null){
+//                Method method = apiClient.getClass().getMethod(oldInterfaceInfo.getName());
+//                method.invoke(apiClient);
+//            } else {
                 /**
                  * 优化逻辑，将所有的都封装为一个参数，由管理员进行更新发布
                  */
@@ -378,9 +378,9 @@ public class InterfaceInfoController {
 //                Method method = apiClient.getClass().getMethod(oldInterfaceInfo.getName(), classes) ;
 //                Method method = apiClient.getClass().getMethod(oldInterfaceInfo.getName(), Class.forName(paramsType));
 //                result = method.invoke(apiClient);
-
-            }
-        }
+//
+//            }
+//        }
 //        com.daken.apiclientsdk.model.User user = gson.fromJson(userRequestParams, com.daken.apiclientsdk.model.User.class);
 //        String result = apiClient.getUsernameByPost(user);
         return ResultUtils.success(result);
@@ -407,4 +407,7 @@ public class InterfaceInfoController {
         }
         return ResultUtils.success(interfaceNameMap);
     }
+
+    // endregion
+
 }

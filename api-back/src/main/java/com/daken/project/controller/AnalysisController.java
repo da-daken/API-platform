@@ -41,7 +41,7 @@ public class AnalysisController {
     @GetMapping("/top/interface/invoke")
     @AuthCheck(mustRole = "admin")
     public BaseResponse<List<InterfaceInfoVo>> listTopInvokeInterfaceInfo() {
-        List<UserInterfaceInfo> userInterfaceInfoList = userInterfaceInfoMapper.listTopInvokeInterfaceInfo(3);
+        List<UserInterfaceInfo> userInterfaceInfoList = userInterfaceInfoMapper.listTopInvokeInterfaceInfo(10);
         Map<Long, List<UserInterfaceInfo>> idGroupMap = userInterfaceInfoList.stream().collect(Collectors.groupingBy(UserInterfaceInfo::getInterfaceInfoId));
         QueryWrapper<InterfaceInfo> queryWrapper=new QueryWrapper<>();
         queryWrapper.in("id", idGroupMap.keySet());
@@ -52,7 +52,7 @@ public class AnalysisController {
         List<InterfaceInfoVo> interfaceInfoVoList = BeanCopyUtils.copyBeanList(list , InterfaceInfoVo.class);
         List<InterfaceInfoVo> interfaceInfoVos = interfaceInfoVoList.stream().map(interfaceInfoVo -> {
             List<UserInterfaceInfo> userInterfaceInfos = idGroupMap.get(interfaceInfoVo.getId());
-            interfaceInfoVo.setTotalNum(userInterfaceInfos.get(0).getTotalNum());
+            interfaceInfoVo.setTotalNum(userInterfaceInfos.get(0).getTotalNum() - userInterfaceInfos.get(0).getLeftNum());
             return interfaceInfoVo;
         }).collect(Collectors.toList());
         return ResultUtils.success(interfaceInfoVos);
