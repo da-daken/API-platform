@@ -90,7 +90,7 @@ const Login: React.FC = () => {
         <LoginFormPage
           backgroundImageUrl="http://yuque.heshuoshi.top/html5/77a5cdb66c9644cdbe6db3753037b5f6.jpg"
           logo={<img alt="logo" src="/logo.svg"/>}
-          title="Daken API平台"
+          title="交大 API平台"
           subTitle={'华东交通大学'}
           initialValues={{
             autoLogin: true,

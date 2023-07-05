@@ -8,10 +8,7 @@ import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
 import com.daken.apiclientsdk.common.HttpMethod;
-import com.daken.apiclientsdk.model.AvatarParams;
-import com.daken.apiclientsdk.model.BaiduHotParams;
-import com.daken.apiclientsdk.model.DouYinParseParams;
-import com.daken.apiclientsdk.model.User;
+import com.daken.apiclientsdk.model.*;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.UnsupportedEncodingException;
@@ -35,10 +32,6 @@ public class ApiClient {
      */
     private static final String GATEWAY_HOST = "http://localhost:8090";
 
-    /**
-     * get请求的参数map
-     */
-    private static Map<String, Object> GET_PARAMS;
 
 
     public ApiClient(String accessKey, String secretKey) {
@@ -78,10 +71,26 @@ public class ApiClient {
         return baiduHotInfo;
     }
 
+    /**
+     * 解析抖音url
+     * @param douYinParseParams
+     * @return
+     */
     public String getDouYinUrlParse(DouYinParseParams douYinParseParams){
         String params = JSON.toJSONString(douYinParseParams);
         String urlParse = onlineInvoke(params, "/api/douyin/parse", HttpMethod.GET_METHOD);
         return urlParse;
+    }
+
+    /**
+     * 获取火车的信息
+     * @param trainParams
+     * @return
+     */
+    public String getTrainInfo(TrainParams trainParams){
+        String params = JSON.toJSONString(trainParams);
+        String result = onlineInvoke(params, "/api/train/getTrainInfo", HttpMethod.GET_METHOD);
+        return result;
     }
 
 
@@ -115,10 +124,11 @@ public class ApiClient {
             result = httpResponse.body();
         }
         else if (HttpMethod.GET_METHOD.equals(method)){
-            GET_PARAMS = JSON.parseObject(parameters, new TypeReference<Map<String, Object>>(){});
+            Map<String, Object> getParams = JSON.parseObject(parameters, new TypeReference<Map<String, Object>>() {
+            });
             HttpResponse httpResponse = HttpRequest.get(GATEWAY_HOST + url)
                     .addHeaders(getHeaderMap(parameters))
-                    .form(GET_PARAMS)
+                    .form(getParams)
                     .execute();
             log.info("返回状态：{}  返回结果 : {}", httpResponse.getStatus(), httpResponse.body());
             result = httpResponse.body();

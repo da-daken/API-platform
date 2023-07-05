@@ -18,6 +18,11 @@
     </properties>
     <dependencies>
         <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5.13</version>
+        </dependency>
+        <dependency>
             <groupId>com.daken</groupId>
             <artifactId>api-client-sdk</artifactId>
             <version>0.0.1-SNAPSHOT</version>
