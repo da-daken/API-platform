@@ -51,7 +51,6 @@ const StepResult: React.FC<{
           <Button type="primary" onClick={props.onFinish}>
             再充一次
           </Button>
-          <Button>查看账单</Button>
         </>
       }
       className={styles.result}

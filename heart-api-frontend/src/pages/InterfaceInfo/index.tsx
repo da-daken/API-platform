@@ -43,7 +43,7 @@ const Index: React.FC = () => {
       param.url = "https://v.douyin.com/i2MDg5H/"
     }
     //火车接口
-    if(Number(params.id)===5){
+    if(Number(params.id)===8){
       param.train_no = "5l0000G144Y3";
       param.from_station_telecode = "AOH";
       param.to_station_telecode = "VNP";

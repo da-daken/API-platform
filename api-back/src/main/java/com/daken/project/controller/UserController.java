@@ -64,7 +64,7 @@ public class UserController {
             return null;
         }
         if (sensitiveWordUtils.hasSensitiveWord(userAccount)){
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "请文明用语呢傻逼");
+            throw new BusinessException(ErrorCode.OPERATION_ERROR, "请文明用语呢");
         }
         long result = userService.userRegister(userAccount, userPassword, checkPassword);
         return ResultUtils.success(result);

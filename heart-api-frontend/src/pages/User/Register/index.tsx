@@ -26,7 +26,9 @@ const Register: React.FC = () => {
       const id = await userRegisterUsingPOST(values);
       if (id.code===40000){
         message.error('账号已被注册！');
-      }else {
+      } if (id.code===50001){
+        message.error('请文明用语呢');
+      } else {
         const defaultLoginSuccessMessage = '注册成功！';
         message.success(defaultLoginSuccessMessage);
 

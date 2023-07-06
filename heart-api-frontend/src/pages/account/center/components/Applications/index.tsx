@@ -73,9 +73,7 @@ const Applications: React.FC = () => {
             hoverable
             bodyStyle={{ paddingBottom: 20 }}
             actions={[
-              <Tooltip title="分享" key="share">
-                <ShareAltOutlined />
-              </Tooltip>,
+
             ]}
           >
             <Card.Meta  title={item.interfaceName} />

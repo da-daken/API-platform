@@ -69,7 +69,7 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
         log.info("请求参数"+ request.getQueryParams().toSingleValueMap());
         log.info("请求来源地址"+sourceAddress);
         ServerHttpResponse response = exchange.getResponse();
-        // 3. 黑白名单
+//         3. 黑白名单
 //        if(!IP_WHITE_LIST.contains(sourceAddress)){
 //            return handleNoAuth(response);
 //        }
