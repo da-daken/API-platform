@@ -1,18 +1,14 @@
 package com.daken.project.service.impl;
 
-import cn.hutool.core.util.RandomUtil;
-import cn.hutool.crypto.digest.DigestUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.daken.common.entity.User;
-import com.daken.project.common.ErrorCode;
 import com.daken.project.exception.BusinessException;
 import com.daken.project.mapper.UserMapper;
 import com.daken.project.service.UserService;
+import com.daken.common.ErrorCode;
 import com.daken.project.utils.GenerateAkSkUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

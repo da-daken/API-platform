@@ -1,6 +1,6 @@
 package com.daken.project.model.dto.userInterfaceInfo;
 
-import com.daken.project.common.PageRequest;
+import com.daken.common.PageRequest;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

@@ -1,4 +1,4 @@
-package com.daken.project.common;
+package com.daken.common;
 
 import lombok.Data;
 

@@ -3,12 +3,14 @@ package com.daken.project.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.daken.apiclientsdk.client.ApiClient;
+import com.daken.common.DeleteRequest;
 import com.daken.common.entity.InterfaceInfo;
 import com.daken.common.entity.User;
 import com.daken.common.entity.UserInterfaceInfo;
 import com.daken.project.annotation.AuthCheck;
-import com.daken.project.common.*;
+import com.daken.common.BaseResponse;
+import com.daken.common.ErrorCode;
+import com.daken.common.ResultUtils;
 import com.daken.project.constant.CommonConstant;
 import com.daken.project.constant.UserConstant;
 import com.daken.project.exception.BusinessException;
@@ -211,7 +213,7 @@ public class UserInterfaceInfoController {
     }
 
     /**
-     * 用户购买接口
+     * 管理员充值接口
      * @param buyDto
      * @return
      */

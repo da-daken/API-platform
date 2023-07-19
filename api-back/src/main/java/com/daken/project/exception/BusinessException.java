@@ -1,6 +1,7 @@
 package com.daken.project.exception;
 
-import com.daken.project.common.ErrorCode;
+
+import com.daken.common.ErrorCode;
 
 /**
  * 自定义异常类
