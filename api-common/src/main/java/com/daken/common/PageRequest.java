@@ -1,7 +1,7 @@
 package com.daken.common;
 
-import com.daken.project.constant.CommonConstant;
 import lombok.Data;
+import com.daken.common.constants.CommonConstant;
 
 /**
  * 分页请求
