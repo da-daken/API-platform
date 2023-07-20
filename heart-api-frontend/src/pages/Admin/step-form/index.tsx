@@ -51,7 +51,6 @@ const StepResult: React.FC<{
           <Button type="primary" onClick={props.onFinish}>
             再充一次
           </Button>
-          <Button>查看账单</Button>
         </>
       }
       className={styles.result}
@@ -91,7 +90,7 @@ const StepForm: React.FC<Record<string, any>> = () => {
     }, [])
 
     return (
-      <PageContainer content="将一个冗长或用户不熟悉的表单任务分成多个步骤，指导用户完成。">
+      <PageContainer>
         <Card bordered={false}>
           <StepsForm
             current={current}

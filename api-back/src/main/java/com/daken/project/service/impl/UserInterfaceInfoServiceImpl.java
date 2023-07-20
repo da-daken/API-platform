@@ -52,7 +52,7 @@ public class UserInterfaceInfoServiceImpl extends ServiceImpl<UserInterfaceInfoM
         updateWrapper.eq("interfaceInfoId", interfaceInfoId);
         updateWrapper.eq("userId", userId);
         updateWrapper.gt("leftNum", 0);
-        updateWrapper.setSql("leftNum = leftNum - 1 , totalNum = totalNum + 1");
+        updateWrapper.setSql("leftNum = leftNum - 1");
         boolean result = update(updateWrapper);
         return result;
     }

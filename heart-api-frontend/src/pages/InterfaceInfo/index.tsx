@@ -42,6 +42,13 @@ const Index: React.FC = () => {
     if(Number(params.id)===4){
       param.url = "https://v.douyin.com/i2MDg5H/"
     }
+    //火车接口
+    if(Number(params.id)===8){
+      param.train_no = "5l0000G144Y3";
+      param.from_station_telecode = "AOH";
+      param.to_station_telecode = "VNP";
+      param.depart_date = "2023-07-05";
+    }
     setLoading(true);
     try {
       const res = await getInterfaceInfoByIdUsingGET({
@@ -89,7 +96,7 @@ const Index: React.FC = () => {
       }
       if(params.id==='1'){
         setImg(res.data);
-      }else {
+      } else {
         result=JSON.parse(res.data);
       }
       console.log(typeof result)
