@@ -36,13 +36,14 @@ public class RocketMqUtils {
 
     /**
      * 发送订单消息,延时队列30分钟，未支付会自动过期
-     * todo 这个接收端还没写
+     *
      * @param apiOrder
      */
     public void sendOrderSnInfo(ApiOrder apiOrder){
         finalId1 = apiOrder.getId();
         redisCache.setCacheObject(RedisConstant.SEND_ORDER_PREFIX + apiOrder.getId(), apiOrder);
         String message = JSON.toJSONString(apiOrder, new SerializerFeature[]{SerializerFeature.WriteClassName});
+        // 延时队列
         rocketMQTemplate.syncSend(topic, MessageBuilder.withPayload(message).build(), DELAY_TIME);
     }
 

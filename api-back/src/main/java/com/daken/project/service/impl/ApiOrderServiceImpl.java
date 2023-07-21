@@ -25,6 +25,7 @@ import com.daken.common.entity.InterfaceInfo;
 import com.daken.common.entity.User;
 import com.daken.common.entity.UserInterfaceInfo;
 import com.daken.project.constant.CommonConstant;
+import com.daken.project.constant.OrderStatus;
 import com.daken.project.exception.BusinessException;
 import com.daken.project.mapper.ApiOrderMapper;
 import com.daken.project.model.dto.order.ApiOrderCancelDto;
@@ -154,7 +155,7 @@ public class ApiOrderServiceImpl extends ServiceImpl<ApiOrderMapper, ApiOrder>
         apiOrder.setTotalAmount(totalAmount);
         apiOrder.setOrderSn(orderSn);
         apiOrder.setOrderNum(orderNum);
-        apiOrder.setStatus(OrderConstant.toBePaid);
+        apiOrder.setStatus(OrderStatus.ORDER_NO_PAY.getStatus());
         apiOrder.setInterfaceId(interfaceId);
         apiOrder.setUserId(userId);
         apiOrder.setCharging(charging);
@@ -212,11 +213,11 @@ public class ApiOrderServiceImpl extends ServiceImpl<ApiOrderMapper, ApiOrder>
         String orderSn = apiOrderCancelDto.getOrderSn();
         //订单已经被取消的情况
         ApiOrder orderSn1 = this.getOne(new QueryWrapper<ApiOrder>().eq("orderSn", orderSn));
-        if (orderSn1.getStatus() == 2){
+        if (Objects.equals(orderSn1.getStatus(), OrderStatus.ORDER_CANCEL.getStatus())){
             return ResultUtils.success("取消订单成功");
         }
         //更新订单表状态
-        this.update(new UpdateWrapper<ApiOrder>().eq("orderSn", orderSn).set("status",2));
+        this.update(new UpdateWrapper<ApiOrder>().eq("orderSn", orderSn).set("status",OrderStatus.ORDER_CANCEL));
         return ResultUtils.success("取消订单成功");
     }
 
@@ -226,7 +227,7 @@ public class ApiOrderServiceImpl extends ServiceImpl<ApiOrderMapper, ApiOrder>
      */
     @Override
     public void orderPaySuccess(String orderSn) {
-        this.update(new UpdateWrapper<ApiOrder>().eq("orderSn",orderSn).set("status",1));
+        this.update(new UpdateWrapper<ApiOrder>().eq("orderSn",orderSn).set("status",OrderStatus.ORDER_PAY_SUCCESS.getStatus()));
     }
 
     /**
@@ -290,7 +291,7 @@ public class ApiOrderServiceImpl extends ServiceImpl<ApiOrderMapper, ApiOrder>
         if (null == loginUser){
             throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR);
         }
-        // 2. 健壮性校验
+        // 2. 健壮性校验 (接口是否存在，用户是否是同一个，订单是否被取消)
         Long interfaceInfoId = payDto.getInterfaceInfoId();
         Long userId = payDto.getUserId();
         Long orderNum = payDto.getOrderNum();
@@ -305,6 +306,9 @@ public class ApiOrderServiceImpl extends ServiceImpl<ApiOrderMapper, ApiOrder>
         InterfaceInfo interfaceInfo = interfaceInfoService.getById(interfaceInfoId);
         if (null == interfaceInfo){
             throw new BusinessException(ErrorCode.INTERFACE_NO_FOUND);
+        }
+        if (OrderStatus.ORDER_CANCEL.getStatus().equals(status)){
+            return ResultUtils.error(ErrorCode.ORDER_BE_CANCEL);
         }
         // 3. 购买接口,修改订单状态
         // 幂等性保证：判断该订单是否被处理过
