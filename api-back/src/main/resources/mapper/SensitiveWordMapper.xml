@@ -7,9 +7,10 @@
     <resultMap id="BaseResultMap" type="com.daken.common.entity.SensitiveWord">
             <id property="id" column="id" jdbcType="INTEGER"/>
             <result property="word" column="word" jdbcType="VARCHAR"/>
+            <result property="word_type" column="word_type" jdbcType="INTEGER"/>
     </resultMap>
 
     <sql id="Base_Column_List">
-        id,word
+        id,word,word_type
     </sql>
 </mapper>
