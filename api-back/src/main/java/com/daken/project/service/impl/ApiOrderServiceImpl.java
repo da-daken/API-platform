@@ -40,6 +40,9 @@ import com.daken.project.service.InterfaceInfoService;
 import com.daken.project.service.UserInterfaceInfoService;
 import com.daken.project.service.UserService;
 import com.daken.project.utils.RocketMqUtils;
+import org.apache.rocketmq.client.producer.SendStatus;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -65,6 +68,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import static com.daken.project.constant.LockPrefix.PAY_LOCK_PREFIX;
+
 /**
 * @author 12866
 * @description 针对表【order】的数据库操作Service实现
@@ -78,6 +83,8 @@ public class ApiOrderServiceImpl extends ServiceImpl<ApiOrderMapper, ApiOrder>
     @Autowired
     private RedisTemplate redisTemplate;
 
+    @Autowired
+    private RedissonClient redissonClient;
     @Resource
     private UserService userService;
 
@@ -95,6 +102,8 @@ public class ApiOrderServiceImpl extends ServiceImpl<ApiOrderMapper, ApiOrder>
 
     @Resource
     private Snowflake snowflake;
+
+
 
     /**
      * 生成订单
@@ -315,9 +324,24 @@ public class ApiOrderServiceImpl extends ServiceImpl<ApiOrderMapper, ApiOrder>
         Object o = redisTemplate.opsForValue().get(RedisConstant.PAY_TRADE_INFO + orderSn);
         if (null == o) {
             // 购买成功，修改订单状态
-            redisTemplate.opsForValue().set(RedisConstant.PAY_TRADE_INFO + orderSn, orderSn);
-            rocketMqUtils.sendOrderPaySuccessInfo(orderSn);
-            return ResultUtils.success("购买成功");
+            RLock lock = redissonClient.getLock(PAY_LOCK_PREFIX + orderSn);
+            try {
+                if (lock.tryLock(80, -1, TimeUnit.MILLISECONDS)){
+                    redisTemplate.opsForValue().set(RedisConstant.PAY_TRADE_INFO + orderSn, orderSn);
+                    SendStatus sendStatus = rocketMqUtils.sendOrderPaySuccessInfo(orderSn);
+                    if (SendStatus.SEND_OK == sendStatus){
+                        return ResultUtils.success("购买成功");
+                    } else {
+                        return ResultUtils.error(ErrorCode.SYSTEM_ERROR, "购买失败");
+                    }
+                } else {
+                    return ResultUtils.error(ErrorCode.OPERATION_ERROR, "订单已过期");
+                }
+            } catch (InterruptedException e) {
+                throw new BusinessException(ErrorCode.SYSTEM_ERROR);
+            } finally {
+                lock.unlock();
+            }
         }
         return ResultUtils.error(ErrorCode.OPERATION_ERROR, "订单正在处理或者已经处理完成，请稍后。。");
     }

@@ -5,6 +5,8 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.daken.common.constants.RedisConstant;
 import com.daken.common.entity.ApiOrder;
+import org.apache.rocketmq.client.producer.SendResult;
+import org.apache.rocketmq.client.producer.SendStatus;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -51,10 +53,11 @@ public class RocketMqUtils {
      * 发送支付成功的消息
      * @param orderSn
      */
-    public void sendOrderPaySuccessInfo(String orderSn){
+    public SendStatus sendOrderPaySuccessInfo(String orderSn){
         finalId2 = orderSn;
         redisCache.setCacheObject(RedisConstant.ORDER_PAY_SUCCESS_INFO + orderSn, orderSn);
         String message = JSON.toJSONString(orderSn, new SerializerFeature[]{SerializerFeature.WriteClassName});
-        rocketMQTemplate.syncSend(topic, MessageBuilder.withPayload(message).build());
+        SendResult sendResult = rocketMQTemplate.syncSend(topic, MessageBuilder.withPayload(message).build());
+        return sendResult.getSendStatus();
     }
 }
